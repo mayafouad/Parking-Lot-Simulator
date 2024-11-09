@@ -8,36 +8,38 @@ public class ParkingLot {
     private int totalCarsServed = 0;
 
     public ParkingLot() {
-        spots = new Semaphore(4);
+        spots = new Semaphore(4, true); // Fair semaphore for FIFO order
     }
 
-    
-    public boolean enterParking() throws InterruptedException {
-        if (spots.tryAcquire()) {
-            synchronized (this) {
-                currentCars++;
-                totalCarsServed++;
+    public boolean enterParking(Car car) {
+        try {
+            // Attempt to acquire a parking spot
+            if (spots.tryAcquire()) {
+                synchronized (this) {
+                    currentCars++;
+                    totalCarsServed++;
+                }
+                return true;
             }
-            return true;
+        } catch (Exception e) {
+            Thread.currentThread().interrupt();
         }
         return false;
     }
 
-
     public void leaveParking() {
-        spots.release();
+        spots.release(); // Release the permit back to the semaphore
         synchronized (this) {
             currentCars--;
         }
     }
 
-
     public synchronized int getCurrentCars() {
         return currentCars;
     }
-
 
     public synchronized int getTotalCarsServed() {
         return totalCarsServed;
     }
 }
+// last update 
