@@ -1,14 +1,13 @@
 package org.OS;
 
-import java.util.concurrent.Semaphore;
 
 public class ParkingLot {
-    private final Semaphore spots;
+    private final semaphore spots;
     private int currentCars = 0;
     private int totalCarsServed = 0;
 
     public ParkingLot() {
-        spots = new Semaphore(4, true); // Fair semaphore for FIFO order
+        spots = new semaphore(4, true); // Fair semaphore for FIFO order
     }
 
     public boolean enterParking(Car car) {
