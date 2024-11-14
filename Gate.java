@@ -1,7 +1,3 @@
-
-
-package org.OS;
-
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -18,6 +14,7 @@ public class Gate {
 
     public void in(Car car) throws InterruptedException {
         synchronized (parkingLot) {
+            long waitStartTime = System.currentTimeMillis(); // Track waiting time
             System.out.println("Car " + car.getCarId() + " from " + car.getGate() + " arrived at time " + car.getArrivalTime());
 
             boolean parkedImmediately = parkingLot.enterParking(car);
@@ -29,13 +26,15 @@ public class Gate {
                 waitingQueue.add(car);
                 System.out.println("Car " + car.getCarId() + " from " + car.getGate() + " waiting for a spot.");
 
-                // Wait until it's this car's turn
+                // Wait until it's this car's turn 
                 while (waitingQueue.peek() != car || !parkingLot.enterParking(car)) {
                     parkingLot.wait();  // Wait for a spot and notifyAll()
                 }
-
+                // calculate the wait time
+                long waitEndTime = System.currentTimeMillis();
+                long waitingTime = (waitEndTime - waitStartTime) / 1000;
                 waitingQueue.remove(); // Remove from queue once it parks
-                System.out.println("Car " + car.getCarId() + " from " + car.getGate() + " parked after waiting. (Parking Status: " + parkingLot.getCurrentCars() + " spots occupied)");
+                System.out.println("Car " + car.getCarId() + " from " + car.getGate() + " parked after waiting for " + waitingTime +" units of time. (Parking Status: " + parkingLot.getCurrentCars() + " spots occupied)");
             }
         }
     }
